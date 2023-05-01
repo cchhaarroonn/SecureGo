@@ -19,15 +19,16 @@ SecureGo requires the MongoDB URI to be set. This can be done by changing "YOUR 
 
 ## Usage
 
-|                     **Route**                        |                    **Description**                      | **Methods** |
-|------------------------------------------------------|---------------------------------------------------------|-------------|
-| /securego/createUser/:username/:password/:license    | Create user account by username, password, license key  | POST        |
-| /securego/removeUser/:username/:license              | Remove user account by username and license             | POST        |
-| /securego/removeUser/:username                       | Remove user account by username                         | POST        |
-| /securego/createLicense                              | Create license key autotmatically with random letters   | POST        |
-| /securego/createLicense/:name                        | Create specific licence key                             | POST        |
-| /securego/checkLicense/:name                         | Check license key by the name that is specified         | GET         |
-| /securego/getLicenses/                               | Get all licenses in database                            | GET         |
+|                     **Route**                        |                                  **Description**                              | **Methods** |
+|------------------------------------------------------|-------------------------------------------------------------------------------|-------------|
+| /securego/createUser/:username/:password/:license    | Create user account by username, password, license key                        | POST        |
+| /securego/removeUser/:username/:license              | Remove user account by username and license                                   | POST        |
+| /securego/removeUser/:username                       | Remove user account by username                                               | POST        |
+| /securego/createLicense                              | Create license key autotmatically with random letters                         | POST        |
+| /securego/createLicense/:name                        | Create specific licence key                                                   | POST        |
+| /securego/removeLicense/:name                        | Remove license from the database, also remove all users who had that license  | POST        |
+| /securego/checkLicense/:name                         | Check license key by the name that is specified                               | GET         |
+| /securego/getLicenses/                               | Get all licenses in database                                                  | GET         |
 
 ## Contribution
 
