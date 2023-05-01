@@ -15,7 +15,8 @@ SecureGo is a simple RESTful API that allows users to create accounts, remove ac
 
 ## Configuration
 
-SecureGo requires the MongoDB URI to be set. This can be done by changing "YOUR DATABASE CONNECT URI" on line 26 to your URI for connecting to database
+SecureGo requires the MongoDB URI to be set. This can be done by changing "YOUR DATABASE CONNECT URI" on line 29 to your URI for connecting to database
+If you want to make rule that there is only one license per user you can set variable onlyOneAccount to true which is currently on line 24
 
 ## Usage
 
@@ -27,8 +28,10 @@ SecureGo requires the MongoDB URI to be set. This can be done by changing "YOUR 
 | /securego/createLicense                              | Create license key autotmatically with random letters                         | POST        |
 | /securego/createLicense/:name                        | Create specific licence key                                                   | POST        |
 | /securego/removeLicense/:name                        | Remove license from the database, also remove all users who had that license  | POST        |
+| /securego/checkUser/:name                            | Check if user exists by username                                              | POST        |
 | /securego/checkLicense/:name                         | Check license key by the name that is specified                               | GET         |
 | /securego/getLicenses/                               | Get all licenses in database                                                  | GET         |
+| /securego/getUser/:name                              | Get info about user by his username                                           | GET         |
 
 ## Contribution
 
