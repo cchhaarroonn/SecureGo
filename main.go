@@ -344,7 +344,6 @@ func main() {
 			})
 			return
 		}
-
 		c.JSON(http.StatusOK, gin.H{
 			"status": "License exists in database",
 		})
