@@ -23,7 +23,7 @@ func main() {
 	//Get context and then connect to DB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("YOUR DATABASE CONNECT URI"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb+srv://admin:admin@development.xkgdtfm.mongodb.net/test"))
 	if err != nil {
 		errors.New("[X] Error occured while trying to connect to DB")
 	}
@@ -197,6 +197,45 @@ func main() {
 				})
 			}
 		}
+	})
+
+	//Remove license from the database, also remove all users who had that license
+	server.POST("/securego/removeLicense/:name", func(c *gin.Context) {
+		name := c.Param("name")
+
+		doc := bson.D{
+			{Key: "License", Value: name},
+		}
+
+		_, err := usersCollection.DeleteMany(context.Background(), bson.D{{Key: "License", Value: name}})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status": "Failed to remove users with the license",
+				"error":  err.Error(),
+			})
+			return
+		}
+
+		result, err := licenseCollection.DeleteOne(context.Background(), doc)
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status": "Failed to remove license from database",
+				"error":  err.Error(),
+			})
+			return
+		}
+
+		if result.DeletedCount == 0 {
+			c.JSON(http.StatusOK, gin.H{
+				"status": "This license doesn't exist in database",
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status": "License removed from database",
+		})
 	})
 
 	//Check license key by the name that is specified
