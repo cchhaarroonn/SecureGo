@@ -20,6 +20,9 @@ type Config struct {
 }
 
 func main() {
+	//Enable weather mutiple accounts can be created with one license or only single account
+	var onlyOneAccount bool = false
+
 	//Get context and then connect to DB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -77,6 +80,19 @@ func main() {
 
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
+				if onlyOneAccount {
+					// Check if an account with the same license already exists in the usersCollection
+					docLicenseUser := bson.D{
+						{Key: "License", Value: license},
+					}
+					var resultLicUser bson.D
+					if err := usersCollection.FindOne(context.Background(), docLicenseUser).Decode(&resultLicUser); err == nil {
+						c.JSON(http.StatusOK, gin.H{
+							"status": "An account with this license already exists",
+						})
+						return
+					}
+				}
 				_, err = usersCollection.InsertOne(context.Background(), doc)
 				if err != nil {
 					log.Fatal(err)
@@ -91,6 +107,74 @@ func main() {
 				})
 			}
 		}
+	})
+
+	//Get info about user by his username
+	server.GET("/securego/getUser/:name", func(c *gin.Context) {
+		// Get the username parameter from the request URL
+		username := c.Param("name")
+
+		// Create a filter for the user with the specified username
+		filter := bson.M{"Username": username}
+
+		// Find the user in the database
+		var user bson.M
+		err := usersCollection.FindOne(context.Background(), filter).Decode(&user)
+		if err != nil {
+			// Return an error message if the user is not found
+			if err == mongo.ErrNoDocuments {
+				c.JSON(http.StatusNotFound, gin.H{
+					"status": "User not found",
+				})
+				return
+			}
+			// Return an error message if there was a problem with the database
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status": "Error fetching user from database",
+				"error":  err.Error(),
+			})
+			return
+		}
+
+		// Extract the password and license key from the user document
+		password := user["Password"].(string)
+		license := user["License"].(string)
+
+		// Return the password and license key as a JSON response
+		c.JSON(http.StatusOK, gin.H{
+			"username": username,
+			"password": password,
+			"license":  license,
+		})
+	})
+
+	//Check if user exists by username
+	server.POST("/securego/checkUser/:name", func(c *gin.Context) {
+		name := c.Param("name")
+
+		//Using this as our document we want to provide and also as filter for checking
+		doc := bson.D{
+			{Key: "Username", Value: name},
+		}
+
+		var result bson.D
+		if err := usersCollection.FindOne(context.Background(), doc).Decode(&result); err != nil {
+			if err == mongo.ErrNoDocuments {
+				c.JSON(http.StatusOK, gin.H{
+					"status": "User doesn't exist in database",
+				})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"status": "Failed to check user in database",
+				"error":  err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status": "User exists in database",
+		})
 	})
 
 	//Remove user account by username and license
