@@ -199,7 +199,7 @@ func main() {
 		}
 	})
 
-	//Get license key by the name that is specified
+	//Check license key by the name that is specified
 	server.GET("/securego/checkLicense/:name", func(c *gin.Context) {
 		name := c.Param("name")
 
