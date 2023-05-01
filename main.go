@@ -23,7 +23,7 @@ func main() {
 	//Get context and then connect to DB
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI("mongodb+srv://admin:admin@development.xkgdtfm.mongodb.net/test"))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI("YOUR DATABASE CONNECT URI"))
 	if err != nil {
 		errors.New("[X] Error occured while trying to connect to DB")
 	}
